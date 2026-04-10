@@ -1,25 +1,87 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+import benchmarkplatform
+import pandas as pd
+import implemented_algos as algorithm
+import resultcomparator
 
-data = {
-    "Algorithmus": ["Pan", "Hamilton", "Shaik", "Park", "Osman", "Xu", "Nguyen", "Zhai", "Kumari", "Xia", "Zahid", "Laitala", "Han CNN", "Xiang", "Celik"],
-    "24 dB": [0.998946012, 0.982418879, 0.999648424, 0.998944282, 0.999296765, 0.99941404, 0.99929693, 0.997427502, 0.999297095, 0.980396844, 0.997894244, 0.996029893, 0.992091184,0.999531287],
-    "18 dB": [0.998244177, 0.981243364, 0.998244587, 0.998356808, 0.994743605, 0.998945765, 0.9985932, 0.989788814, 0.998010532, 0.979236277, 0.996029893, 0.990009294, 0.972966807,0.997427502],
-    "12 dB": [0.984629608, 0.968237347, 0.98057248, 0.99471769, 0.969384245, 0.991616209, 0.986425339, 0.968547746, 0.978532889, 0.965770461, 0.978093818, 0.956621266, 0.928688078,0.967654069],
-    "6 dB": [0.939833795, 0.921137042, 0.93988465, 0.957523566, 0.922733861, 0.945870923, 0.943603543, 0.591863093, 0.915712124, 0.929782082, 0.941740002, 0.902884182, 0.885334441,0.90534188],
-    "0 dB": [0.869361203, 0.85693106, 0.883842225, 0.8618058, 0.857483731, 0.805730517, 0.85933897, 0.110575916, 0.853286985, 0.874844545, 0.896867838, 0.846188042, 0.855085691,0.842926418],
-    "-6 dB": [0.657349398, 0.770648168, 0.821548822, 0.785305344, 0.721356241, 0.580535003, 0.623389619, 0.182434979, 0.803591702, 0.806718822, 0.832273624, 0.799063336, 0.788920538,0.580995704]
-}
+results = {}
+for algo in ["elgendi", "laitala", "zhai", "xia", "arteagaFalconi", "zahid", "han_rnn", "han_cnn", "nguyen", "pan", "hamilton", "xu", "shaik", "celik", "xiang", "park", "kumari"]:
+    dbname, filepath, filelist = benchmarkplatform.load_database(database="MITNST")
+    print(f"Analyzing {dbname} with {algo}:")
+    for file in filelist:
+        record = pd.read_csv(filepath + file + ".csv")
+        data = record.normECG
+        peaks = record.Peaks
+        samplerate = (int(len(record) / record.Time[len(record)-1]))
+        match algo:
+            case "elgendi":
+                foundpeaks = algorithm.elgendi(data=data, samplerate=samplerate)
+            case "laitala":
+                foundpeaks = algorithm.laitala(data=data, samplerate=samplerate)
+            case "zhai":
+                foundpeaks = algorithm.zhai(data=data, samplerate=samplerate)
+            case "xia":
+                foundpeaks = algorithm.xia(data=data, samplerate=samplerate)
+            case "arteagaFalconi":
+                foundpeaks = algorithm.arteagaFalconi(data=data, samplerate=samplerate)
+            case "zahid":
+                foundpeaks = algorithm.zahid(data=data, samplerate=samplerate)
+            case "han_rnn":
+                foundpeaks = algorithm.han_rnn(data=data, samplerate=samplerate)
+            case "han_cnn":
+                foundpeaks = algorithm.han_cnn(data=data, samplerate=samplerate)
+            case "nguyen":
+                foundpeaks = algorithm.nguyen(data=data, samplerate=samplerate)
+            case "pan":
+                foundpeaks = algorithm.pantompkins(data=data, samplerate=samplerate)
+            case "hamilton":
+                foundpeaks = algorithm.hamilton(data=data, samplerate=samplerate)
+            case "xu":
+                foundpeaks = algorithm.xu(data=data, samplerate=samplerate)
+            case "shaik":
+                foundpeaks = algorithm.shaik(data=data, samplerate=samplerate)
+            case "celik":
+                foundpeaks = algorithm.celik(data=data, samplerate=samplerate)
+            case "xiang":
+                foundpeaks = algorithm.xiang(data=data, samplerate=samplerate)
+            case "park":
+                foundpeaks = algorithm.park(data=data, samplerate=samplerate)
+            case "kumari":
+                foundpeaks = algorithm.kumari(data=data, samplerate=samplerate)
+        # Determination of the amount of TP, FP and FN
+        tp, fp, fn = resultcomparator.determination_tpfpfn(detected=foundpeaks, solution = peaks, samplerate = samplerate)
+        precision, sensitivity, accuracy, f1score, der = resultcomparator.overallevaluation(tp,fp,fn)
 
-data["Elgendi"] = [0.99988278, 0.993008623, 0.969358697, 0.914946504, 0.84886859, 0.796559229]
-data["Laitala"] = [0.999648424, 0.989317232, 0.956934554, 0.905870777, 0.830586684, 0.762886598]
-data["Han RNN"] = [0.996029893, 0.998127779, 0.984075698, 0.94810847, 0.900509927, 0.834278238]
+        if algo not in results:
+            results[algo] = [0, 0, 0, 0, 0, 0]
+        if file.endswith("_6"):
+            results[algo][5] += f1score
+        elif file.endswith("00"):
+            results[algo][4] += f1score
+        elif file.endswith("06"):
+            results[algo][3] += f1score
+        elif file.endswith("12"):
+            results[algo][2] += f1score
+        elif file.endswith("18"):
+            results[algo][1] += f1score
+        elif file.endswith("24"):
+            results[algo][0] += f1score
+    
+    # Average F1-Score for each noise level
+    for i in range(6):
+        results[algo][i] /= 2
 
-average_scores = {}
-for algo, scores in data.items():
-    if algo != "Algorithmus":
-        average_scores[algo] = sum(scores) / len(scores)
+
+average_scores = [0, 0, 0, 0, 0, 0]
+
+for algo, scores in results.items():
+    for i in range(len(average_scores)):
+        average_scores[i] += scores[i]
+
+for i in range(len(average_scores)):
+    average_scores[i] /= len(results)
 
 def interpol(x, y):
     x_smooth = np.linspace(min(x), max(x), 300)
@@ -29,19 +91,18 @@ def interpol(x, y):
 
 levels = ["24 dB", "18 dB", "12 dB", "6 dB", "0 dB", "-6 dB"]
 x_values = np.arange(len(levels))
-average_scores = [average_scores[level] for level in levels]
 
 plt.figure(figsize=(10, 4))
 
-scores_elgendi = data["Elgendi"]
+scores_elgendi = results["elgendi"]
 x_smooth_elgendi, y_smooth_elgendi = interpol(x_values, scores_elgendi)
 plt.plot(x_smooth_elgendi, y_smooth_elgendi, marker="", color="blue", linestyle="-", linewidth=2, label="Elgendi")
 
-scores_laitala = data["Laitala"]
+scores_laitala = results["laitala"]
 x_smooth_laitala, y_smooth_laitala = interpol(x_values, scores_laitala)
 plt.plot(x_smooth_laitala, y_smooth_laitala, marker="", color="green", linestyle="-", linewidth=2, label="Laitala")
 
-scores_han_rnn = data["Han RNN"]
+scores_han_rnn = results["han_rnn"]
 x_smooth_han_rnn, y_smooth_han_rnn = interpol(x_values, scores_han_rnn)
 plt.plot(x_smooth_han_rnn, y_smooth_han_rnn, marker="", color="red", linestyle="-", linewidth=2, label="Han RNN")
 
