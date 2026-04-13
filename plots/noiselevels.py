@@ -1,26 +1,25 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-import benchmarkplatform
 import pandas as pd
 import algorithms as algos
 import resultcomparator
 import os
-import csvfilenames
+import databases
 
 results = {}
 
-dataset = csvfilenames.get_dataset("MITNST")
+dataset = databases.get_dataset("MITNST")
 dbname, filepath = dataset.display_name, dataset.path
 
 # Keep order aligned with the plotting labels below (24 dB -> -6 dB)
 noise_groups = [
-    ("24 dB", csvfilenames.mitnst24),
-    ("18 dB", csvfilenames.mitnst18),
-    ("12 dB", csvfilenames.mitnst12),
-    ("6 dB", csvfilenames.mitnst6),
-    ("0 dB", csvfilenames.mitnst0),
-    ("-6 dB", csvfilenames.mitnst_6),
+    ("24 dB", databases.mitnst24),
+    ("18 dB", databases.mitnst18),
+    ("12 dB", databases.mitnst12),
+    ("6 dB", databases.mitnst6),
+    ("0 dB", databases.mitnst0),
+    ("-6 dB", databases.mitnst_6),
 ]
 
 for algo in ["elgendi", "laitala", "zhai", "xia", "arteagaFalconi", "zahid", "han_rnn", "han_cnn", "nguyen", "pantompkins", "hamilton", "xu", "shaik", "celik", "xiang", "park", "kumari"]:

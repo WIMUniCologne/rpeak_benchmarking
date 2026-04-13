@@ -1,15 +1,10 @@
 import pandas as pd
 import resultcomparator as resultcomparator
-import csvfilenames as csvfilenames
+import databases as db
 import os
 import algorithms as algos
 
 dirname = os.path.dirname(__file__)
-
-
-def load_database(database = "MITAR"):
-    dataset = csvfilenames.get_dataset(database)
-    return dataset.display_name, dataset.path, list(dataset.records)
 
 
 # Used for obtaining the Benchmarking Results:
@@ -22,7 +17,7 @@ def r_peak_benchmarker(algo="elgendi", database = "MITAR", individualresults = F
     :param database:            Database the analysis shall be done on
     :param individualresults:   Whether the results for each recording shall be printed or only the overall results
     """
-    dataset = csvfilenames.get_dataset(database)
+    dataset = db.get_dataset(database)
     dbname, filepath, filelist = dataset.display_name, dataset.path, dataset.records
     print(f"Analyzing {dbname} with {algo}:")
     truepos, falsepos, falseneg = 0, 0, 0

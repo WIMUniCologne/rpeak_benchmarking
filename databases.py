@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable, Optional, Union
+from typing import Optional, Union
 
 dirname = os.path.dirname(__file__)
 
