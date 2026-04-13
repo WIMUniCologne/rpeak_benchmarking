@@ -8,39 +8,8 @@ dirname = os.path.dirname(__file__)
 
 
 def load_database(database = "MITAR"):
-
-    match database:
-        case "MITLT":
-            dbname = "MIT Long Term Database"
-            filepath = csvfilenames.mitlt_path
-            filelist = csvfilenames.mitlt_all
-
-        case "Fantasia":
-            dbname = "Fantasia Database"
-            filepath = csvfilenames.fantasia_path
-            filelist = csvfilenames.fantasia_all
-
-        case "PTT":
-            dbname = "Pulse Transit Time Database"
-            filepath = csvfilenames.ptt_path
-            filelist = csvfilenames.ptt_all
-
-        case "MITAR":
-            dbname = "MIT Arrhythmia"
-            filepath = csvfilenames.mitar_path
-            filelist = csvfilenames.mitar_all
-
-        case "MITNST":
-            dbname = "MIT Noise Stress Test Database"
-            filepath = csvfilenames.mitnst_path
-            filelist = csvfilenames.mitnst_all
-
-        case _:
-            dbname = "MIT Arrhythmia"
-            filepath = csvfilenames.mitar_path
-            filelist = csvfilenames.mitar_all
-    
-    return dbname, filepath, filelist
+    dataset = csvfilenames.get_dataset(database)
+    return dataset.display_name, dataset.path, list(dataset.records)
 
 
 # Used for obtaining the Benchmarking Results:
@@ -53,7 +22,8 @@ def r_peak_benchmarker(algo="elgendi", database = "MITAR", individualresults = F
     :param database:            Database the analysis shall be done on
     :param individualresults:   Whether the results for each recording shall be printed or only the overall results
     """
-    dbname, filepath, filelist = load_database(database=database)
+    dataset = csvfilenames.get_dataset(database)
+    dbname, filepath, filelist = dataset.display_name, dataset.path, dataset.records
     print(f"Analyzing {dbname} with {algo}:")
     truepos, falsepos, falseneg = 0, 0, 0
     worst_recording = None
@@ -61,12 +31,12 @@ def r_peak_benchmarker(algo="elgendi", database = "MITAR", individualresults = F
     worst_tp, worst_fp, worst_fn = 0, 0, 0
     tp_list, fp_list, fn_list = [], [], []
     for file in filelist:
-        record = pd.read_csv(filepath + file + ".csv")
+        record = pd.read_csv(os.path.join(filepath, f"{file}.csv"))
         data = record.normECG
         peaks = record.Peaks
         samplerate = (int(len(record) / record.Time[len(record)-1]))
-        if filepath == os.path.join(dirname, 'data/csv/PulseTransitTime/'):
-            samplerate = 500
+        if dataset.samplerate_override is not None:
+            samplerate = dataset.samplerate_override
         match algo:
             case "elgendi":
                 foundpeaks = algos.elgendi(data=data, samplerate=samplerate)
