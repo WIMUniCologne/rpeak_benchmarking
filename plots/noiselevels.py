@@ -3,11 +3,11 @@ import numpy as np
 import scipy
 import benchmarkplatform
 import pandas as pd
-import implemented_algos as algorithm
+import algorithms as algos
 import resultcomparator
 
 results = {}
-for algo in ["elgendi", "laitala", "zhai", "xia", "arteagaFalconi", "zahid", "han_rnn", "han_cnn", "nguyen", "pan", "hamilton", "xu", "shaik", "celik", "xiang", "park", "kumari"]:
+for algo in ["elgendi", "laitala", "zhai", "xia", "arteagaFalconi", "zahid", "han_rnn", "han_cnn", "nguyen", "pantompkins", "hamilton", "xu", "shaik", "celik", "xiang", "park", "kumari"]:
     dbname, filepath, filelist = benchmarkplatform.load_database(database="MITNST")
     print(f"Analyzing {dbname} with {algo}:")
     for file in filelist:
@@ -17,39 +17,39 @@ for algo in ["elgendi", "laitala", "zhai", "xia", "arteagaFalconi", "zahid", "ha
         samplerate = (int(len(record) / record.Time[len(record)-1]))
         match algo:
             case "elgendi":
-                foundpeaks = algorithm.elgendi(data=data, samplerate=samplerate)
+                foundpeaks = algos.elgendi(data=data, samplerate=samplerate)
             case "laitala":
-                foundpeaks = algorithm.laitala(data=data, samplerate=samplerate)
+                foundpeaks = algos.laitala(modelname="laitalamodell_withf1.h5", data=data, samplerate=samplerate)
             case "zhai":
-                foundpeaks = algorithm.zhai(data=data, samplerate=samplerate)
+                foundpeaks = algos.zhai(data=data, samplerate=samplerate)
             case "xia":
-                foundpeaks = algorithm.xia(data=data, samplerate=samplerate)
+                foundpeaks = algos.xia(data=data, samplerate=samplerate)
             case "arteagaFalconi":
-                foundpeaks = algorithm.arteagaFalconi(data=data, samplerate=samplerate)
+                foundpeaks = algos.arteagaFalconi(data=data, samplerate=samplerate)
             case "zahid":
-                foundpeaks = algorithm.zahid(data=data, samplerate=samplerate)
+                foundpeaks = algos.zahid(modelname="zahidmodell_withf1.h5", data=data, samplerate=samplerate)
             case "han_rnn":
-                foundpeaks = algorithm.han_rnn(data=data, samplerate=samplerate)
+                foundpeaks = algos.han_rnn(modelname="hanrnnmodell_withf1_2.h5", data=data, samplerate=samplerate)
             case "han_cnn":
-                foundpeaks = algorithm.han_cnn(data=data, samplerate=samplerate)
+                foundpeaks = algos.han_cnn(modelname="hancnnmodell_withf1_2.h5", data=data, samplerate=samplerate)
             case "nguyen":
-                foundpeaks = algorithm.nguyen(data=data, samplerate=samplerate)
-            case "pan":
-                foundpeaks = algorithm.pantompkins(data=data, samplerate=samplerate)
+                foundpeaks = algos.nguyen(data=data, samplerate=samplerate)
+            case "pantompkins":
+                foundpeaks = algos.pantompkins(data=data, samplerate=samplerate)
             case "hamilton":
-                foundpeaks = algorithm.hamilton(data=data, samplerate=samplerate)
+                foundpeaks = algos.hamilton(data=data, samplerate=samplerate)
             case "xu":
-                foundpeaks = algorithm.xu(data=data, samplerate=samplerate)
+                foundpeaks = algos.xu(data=data, samplerate=samplerate)
             case "shaik":
-                foundpeaks = algorithm.shaik(data=data, samplerate=samplerate)
+                foundpeaks = algos.shaik(data=data, samplerate=samplerate)
             case "celik":
-                foundpeaks = algorithm.celik(data=data, samplerate=samplerate)
+                foundpeaks = algos.celik(modelname="celikmodell_withf1.h5", data=data, samplerate=samplerate)
             case "xiang":
-                foundpeaks = algorithm.xiang(data=data, samplerate=samplerate)
+                foundpeaks = algos.xiang(modelname="xiangmodell_withf1_13.h5", data=data, samplerate=samplerate)
             case "park":
-                foundpeaks = algorithm.park(data=data, samplerate=samplerate)
+                foundpeaks = algos.park(data=data, samplerate=samplerate)
             case "kumari":
-                foundpeaks = algorithm.kumari(data=data, samplerate=samplerate)
+                foundpeaks = algos.kumari(data=data, samplerate=samplerate)
         # Determination of the amount of TP, FP and FN
         tp, fp, fn = resultcomparator.determination_tpfpfn(detected=foundpeaks, solution = peaks, samplerate = samplerate)
         precision, sensitivity, accuracy, f1score, der = resultcomparator.overallevaluation(tp,fp,fn)

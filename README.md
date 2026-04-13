@@ -19,7 +19,7 @@ Supported databases (identifiers used in `main.py` / `benchmarkplatform.py`):
 
 Supported algorithms (identifiers used in `main.py` / `benchmarkplatform.py`):
 
-- Classical/feature-based: `pan`, `hamilton`, `elgendi`, `shaik`, `park`, `arteagaFalconi`, `xu`, `nguyen`, `zhai`, `kumari`, `xia`
+- Classical/feature-based: `pantompkins`, `hamilton`, `elgendi`, `shaik`, `park`, `arteagaFalconi`, `xu`, `nguyen`, `zhai`, `kumari`, `xia`
 - Learned/DL: `zahid`, `laitala`, `han_cnn`, `han_rnn`, `xiang`, `celik`
 
 ## Data preparation

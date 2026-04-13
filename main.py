@@ -10,15 +10,15 @@ if __name__ == '__main__':
     # Writes results/overall_results.txt with FP, FN, Recall, Precision, Error Rate, F1 and 95% CI (bootstrap on F1).
 
     databases_to_run = [
-        #"MITLT",
-        #"Fantasia",
-        #"PTT",
-        #"MITAR",
+        "MITLT",
+        "Fantasia",
+        "PTT",
+        "MITAR",
         "MITNST",
     ]
 
     algos_to_run = [
-        "pan", 
+        "pantompkins", 
         "hamilton", 
         "elgendi", 
         "shaik", 

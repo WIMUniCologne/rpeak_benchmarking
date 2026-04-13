@@ -13,8 +13,6 @@ Used to save files from the CPSC2020 database as csv files
 def cpsc():
     filenames = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
     filepath = os.path.join(dirname, 'data/raw/CPSC/')
-    if not os.path.exists(dirname + "/data/csv/CPSC/"):
-        os.makedirs(dirname + "/data/csv/CPSC/")
     return filenames, filepath
 
 def create_csv(time, rawecg, normecg, peaks, pathname, filename):
@@ -24,6 +22,8 @@ def create_csv(time, rawecg, normecg, peaks, pathname, filename):
 def createcpsccsvfiles():
     samplerateofrecords = 400
     numberofchannels = 1
+    if not os.path.exists(dirname + "/data/csv/CPSC/"):
+        os.makedirs(dirname + "/data/csv/CPSC/")
     filenames, filepath = cpsc()
     recordlengthmin = 0
     recordlengthmax = 0
